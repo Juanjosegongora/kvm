@@ -114,6 +114,8 @@ Ya solo nos quedaria por asignarle la red que va a utilizar pero podriamos confi
 
 Al finalizar nos sale la ventana con todas las configuraciones de "Hardware" que le podemos hacer a la maquina.
 
+## CONFIGURACION DE LA MAQUINA VIRUTAL
+
 ![](images/hardware.png)
 
 Para por ejemplo agregar la otra red que hemos creado antes seria abajo donde pone agregar hardware.
@@ -124,4 +126,39 @@ En esta ventana podemos agregar un monton de cosas como una nueva red, un nuevo 
 
 Cuando acabemos la agregamos y vemos como nos sale un nuevo apartado de red (NIC) en la ventada de antes de configuracion.
 
-![](images/)
+![](images/nic.png)
+
+Podriamos cambiar muchas cosas mas pero de momento esto esta perfecto, damos en inciar instalacion y comenzamos.
+
+## INSTALACION DE DRIVERS PARA KVM EN MAQUINA VIRTUAL.
+
+![](images/instalacion.png)
+
+Simplemente isntalar el sistema operativo que queremos...
+
+![](images/instalacion3.png)
+
+Tal como esta ya podriamos cambiarle la resolucion pero recopiendo hacerlo despues de instalar las `Spice Guest` podemos descargarlas desde la pagina oficial para windows.
+
+```
+https://www.spice-space.org/download/windows/spice-guest-tools/spice-guest-tools-latest.exe
+```
+
+Simplemente instalarlas en la maquina virtual y reiniciarla.
+
+Tambien podriamos poner la red en `virtio` desde el hardware.
+
+![](images/virtio.png)
+
+Inportante darle a aplicar, si pasas a otro sitio no se aplica sino le das.
+
+![](images/virtio_win.png)
+
+Para la instalacion de estas en linux se hacen mediante paquetes, los siguientes...
+
+```
+apt install spice-vdagent spice-webdavd
+```
+
+# OTRAS CONFIGURACIONES DE MAQUINA.
+
