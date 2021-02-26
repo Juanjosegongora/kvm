@@ -39,7 +39,9 @@ Por ultimo iniciar la aplicacion en la que podremos administrarlo todo `Gestor d
 
 # REDES VIRTUALES Y ALMACENAMIENTO.
 
-## REDES VIRTUALES
+## REDES VIRTUALES.
+
+### GESTION DESDE INTERFAZ GRAFICA.
 
 Antes de la puesta en marcha de maquinas virtuales es bueno saber que se pueden crear varias redes virtuales tambien, para hacer con ellas lo que queramos, en el `gestor de maquinas virtuales > editar > detalles de la conexion > redes virtuales` encontramos el gestor.
 
@@ -62,7 +64,116 @@ Puedes seleccionar el modo y el dispositivo fisico que quieras para cada una de 
 
 ![](images/redes_virtuales_g2.png)
 
+### GESTION DESDE CONSOLA.
+
+Mostrar las redes virtuales con la orden
+```
+virsh net-list
+```
+
+El contenido nos da algo asi.
+
+```
+ Name      State    Autostart   Persistent
+--------------------------------------------
+ default   active   yes         yes
+```
+
+Ver informacion sobre la red virtual (probemos con la red `default`)
+```
+<network>
+  <name>default</name>
+  <uuid>bd974baf-4721-43cd-be11-49c51d7d2403</uuid>
+  <forward mode='nat'>
+    <nat>
+      <port start='1024' end='65535'/>
+    </nat>
+  </forward>
+  <bridge name='virbr0' stp='on' delay='0'/>
+  <mac address='52:54:00:2f:74:76'/>
+  <ip address='192.168.122.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='192.168.122.2' end='192.168.122.254'/>
+    </dhcp>
+  </ip>
+</network>
+```
+Como podemos notar nos da la informacion en formato `XML`
+
+
+Creacion de una red virtual.
+
+Para esto cogeremos el contenido de la red `default` y lo usaremos como plantilla.
+```
+virsh net-dumpxml default > private.xml
+```
+Cogemos ese archivo y tendremos que quitar los parametros de UUID y MAC y cambiar tanto la IP, el nombre y el rango DHCP.
+```
+<network>
+  <name>private</name>
+  <forward mode='nat'>
+    <nat>
+      <port start='1024' end='65535'/>
+    </nat>
+  </forward>
+  <bridge name='private' stp='on' delay='0'/>
+  <ip address='192.168.100.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='192.168.100.2' end='192.168.100.254'/>
+    </dhcp>
+  </ip>
+</network>
+```
+Lo siguiente es definirla en KVM
+```
+virsh net-define private.xml 
+Network private defined from private.xml
+```
+Poner en marcha la red...
+```
+virsh net-start private
+Network private started
+```
+Podemos hacer que la red se autoencienda cuando reiniciemos maquina o servicio de libvirt
+```
+virsh net-autostart private
+Network private marked as autostarted
+```
+Ahora podemos comprobar como tenemos las dos redes si las listamos.
+```
+virsh net-list --all
+
+ Name      State    Autostart   Persistent
+--------------------------------------------
+ default   active   yes         yes
+ private   active   yes         yes
+
+```
+O ver como ya tenemos la UUID y la MAC en el archivo.
+```
+virsh net-dumpxml private
+
+<network>
+  <name>private</name>
+  <uuid>06bd37c6-505a-472e-8e33-c4401c0f5f7e</uuid>
+  <forward mode='nat'>
+    <nat>
+      <port start='1024' end='65535'/>
+    </nat>
+  </forward>
+  <bridge name='private' stp='on' delay='0'/>
+  <mac address='52:54:00:11:3a:ff'/>
+  <ip address='192.168.100.1' netmask='255.255.255.0'>
+    <dhcp>
+      <range start='192.168.100.2' end='192.168.100.254'/>
+    </dhcp>
+  </ip>
+</network>
+```
+
 ## ALAMCENAMIENTO
+
+### GESTION DESDE INTERFAZ GRAFICA.
 
 En el apartado de alamcenamiento podremos agregar los directorios de maquina  virtual que usaremos para o bien guardar los discos duros virtuales o tambien para seleccionar la carpeta donde tendremos las `ISOS` de instalacion de los `SSOO` `gestor de maquinas virtuales > editar > detalles de la conexion > Almacenamiento`
 
@@ -71,6 +182,9 @@ En el apartado de alamcenamiento podremos agregar los directorios de maquina  vi
 La que tenemos por defecto es donde se guardaran los discos duros de las maquinas virutales, en `KVM` el espacio de un disco duro virtual se asigna entero, no existe la opcion de reservarlo dinamicamente segun lo que ocupe la maquina.
 
 En el caso por defecto los discos duros virtuales se guardan en `var/lib/libvirt/images/` Si queremos que se guarden en otro lugar lo suyo es agregarlo aqui y cuando se instale la maquina se puede cambiar donde se guardara, tambien se podria cambiar una vez instalada la maquina cambiandolo desde los ajustes y moviendo el archivo de un sitio a otro.
+
+### GESTION DESDE CONSOLA.
+
 
 # PREPARACION Y CONFIGURACION DE UNA MAQUINA VIRTUAL.
 
